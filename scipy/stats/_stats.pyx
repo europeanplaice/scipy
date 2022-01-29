@@ -690,7 +690,7 @@ ctypedef fused real:
 
 @cython.wraparound(False)
 @cython.boundscheck(False)
-def gaussian_kernel_estimate(points, values, xi, precision, dtype, real _=0):
+def gaussian_kernel_estimate(points, values, xi, precision, dtype):
     """
     def gaussian_kernel_estimate(points, real[:, :] values, xi, precision)
 
