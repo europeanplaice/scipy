@@ -27,7 +27,7 @@ from scipy._lib._util import check_random_state
 
 from numpy import (asarray, atleast_2d, reshape, zeros, newaxis, dot, exp, pi,
                    sqrt, ravel, power, atleast_1d, squeeze, sum, transpose,
-                   ones, cov)
+                   ones, cov, log)
 import numpy as np
 
 # Local imports.
@@ -587,39 +587,7 @@ class gaussian_kde:
         """
         Evaluate the log of the estimated pdf on a provided set of points.
         """
-        points = atleast_2d(x)
-
-        d, m = points.shape
-        if d != self.d:
-            if d == 1 and m == self.d:
-                # points was passed in as a row vector
-                points = reshape(points, (self.d, 1))
-                m = 1
-            else:
-                msg = "points have dimension %s, dataset has dimension %s" % (d,
-                    self.d)
-                raise ValueError(msg)
-
-        if m >= self.n:
-            # there are more points than data, so loop over data
-            energy = np.empty((self.n, m), dtype=float)
-            for i in range(self.n):
-                diff = self.dataset[:, i, newaxis] - points
-                tdiff = dot(self.inv_cov, diff)
-                energy[i] = sum(diff*tdiff, axis=0)
-            log_to_sum = 2.0 * np.log(self.weights) - self.log_det - energy.T
-            result = logsumexp(0.5 * log_to_sum, axis=1)
-        else:
-            # loop over points
-            result = np.empty((m,), dtype=float)
-            for i in range(m):
-                diff = self.dataset - points[:, i, newaxis]
-                tdiff = dot(self.inv_cov, diff)
-                energy = sum(diff * tdiff, axis=0)
-                log_to_sum = 2.0 * np.log(self.weights) - self.log_det - energy
-                result[i] = logsumexp(0.5 * log_to_sum)
-
-        return result
+        return log(self.pdf(x))
 
     @property
     def weights(self):
